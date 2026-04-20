@@ -1,0 +1,6 @@
+{
+  "appId": "com.omscanner.app",
+  "appName": "OmScanner",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
