@@ -1,20 +1,24 @@
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { DocumentScanner } from '@capacitor-mlkit/document-scanner';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 
 export const ScannerService = {
-  async takePhoto() {
+  /**
+   * Opens the professional Native ML Kit Scanner.
+   * Handles edge detection, perspective correction and multi-page capture.
+   */
+  async scanDocument() {
     try {
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false, // We use our own cropper
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
+      const { scans } = await DocumentScanner.scan({
+        maxNumScenes: 20, // Support multi-page (up to 20)
+        galleryImportAllowed: true,
       });
-      return image;
+      
+      // scans contains an array of { imageUri: string }
+      return scans.map(s => s.imageUri);
     } catch (error) {
-      console.error('Error taking photo:', error);
+      console.error('Error in Native Scanning:', error);
       return null;
     }
   },
@@ -42,7 +46,6 @@ export const ScannerService = {
         directory: Directory.Documents,
       });
       
-      // Map files to include their full native path for display
       const docs = await Promise.all(result.files.map(async (file) => {
         const fileStat = await Filesystem.getUri({
           path: `OmScanner/${file.name}`,
@@ -57,7 +60,7 @@ export const ScannerService = {
         };
       }));
 
-      // Return only PDFs for the dashboard, using their corresponding JPEGs as thumbnails if they exist
+      // Return reverse chronological list
       return docs.filter(d => d.isPdf).sort((a,b) => b.name.localeCompare(a.name));
     } catch (error) {
       console.warn('OmScanner directory might not exist yet');
@@ -69,9 +72,9 @@ export const ScannerService = {
     try {
       await Share.share({
         title: fileName,
-        text: 'Compartido desde OmScanner',
+        text: 'Enviado desde OmScanner',
         url: uri,
-        dialogTitle: 'Enviar documento',
+        dialogTitle: 'Compartir Documento',
       });
     } catch (error) {
       console.error('Error sharing PDF:', error);
