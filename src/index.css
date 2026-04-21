@@ -187,6 +187,7 @@ button.secondary:hover {
 .w-8 { width: 2rem; }
 .h-8 { height: 2rem; }
 .h-6 { height: 1.5rem; }
+.h-5 { height: 1.25rem; }
 .h-4 { height: 1rem; }
 .h-3 { height: 0.75rem; }
 .w-auto { width: auto; }

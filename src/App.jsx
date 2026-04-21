@@ -111,7 +111,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
               src="/logo.png" 
               alt="Black Hat One" 
               onError={(e) => e.target.style.display = 'none'} 
-              className="h-5 w-auto grayscale brightness-200" 
+              className="h-4 w-auto grayscale brightness-200" 
            />
            <div className="flex items-center gap-1.5 text-[8px] text-gray-400 font-bold tracking-[0.1em]">
               <span>BLACK HAT ONE</span>
