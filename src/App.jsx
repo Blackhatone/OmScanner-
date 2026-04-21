@@ -32,7 +32,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
   const filteredDocs = documents.filter(doc => doc.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   return (
-    <div className="flex flex-col min-h-screen p-6 pb-32">
+    <div className="flex flex-col min-h-screen p-6">
       <header className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">OmScanner <span className="text-primary text-sm align-top">3.2</span></h1>
@@ -79,24 +79,24 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
               transition={{ delay: i * 0.05 }}
             >
               <div className="w-12 h-16 bg-primary/5 rounded-xl flex items-center justify-center border border-primary/10 shrink-0">
-                <FileText size={24} className="text-primary/30" />
+                <FileText size={20} className="text-primary/30" />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-bold truncate text-gray-200">{doc.name.replace('.pdf', '')}</h4>
-                <p className="text-[9px] text-gray-600 mt-1 uppercase font-bold tracking-widest text-primary/50">Documento PDF</p>
+                <p className="text-[9px] text-gray-600 mt-1 uppercase font-bold tracking-widest text-primary/40">Documento PDF</p>
               </div>
               <div className="flex gap-1">
                 <button 
                    onClick={() => onShare(doc.uri, doc.name)} 
                    className="p-3 text-primary/60 active:scale-90 transition-transform bg-white/5 rounded-xl"
                 >
-                    <Share2 size={18} />
+                    <Share2 size={16} />
                 </button>
                 <button 
                    onClick={() => onDelete(doc.name)} 
                    className="p-3 text-accent/50 active:scale-90 transition-transform bg-white/5 rounded-xl"
                 >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                 </button>
               </div>
             </motion.div>
@@ -104,28 +104,26 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
         )}
       </div>
 
-      <footer className="mt-12 flex flex-col items-center justify-end gap-3 opacity-30 hover:opacity-100 transition-all duration-700">
-         <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-         <p className="text-[9px] text-gray-500 font-bold tracking-[0.4em] uppercase">Desarrollado por</p>
-         <img 
-            src="/logo.png" 
-            alt="Black Hat One" 
-            onError={(e) => e.target.style.display = 'none'} 
-            className="h-5 w-auto grayscale brightness-200 opacity-80" 
-         />
-         <div className="flex items-center gap-1 text-[8px] text-gray-800 font-bold tracking-tighter">
-            <span>BLACK HAT ONE</span>
-            <ExternalLink size={6} />
-         </div>
-      </footer>
+      <div className="mt-12 mb-8 flex flex-col items-center gap-6">
+        <footer className="flex flex-col items-center gap-2 opacity-20">
+           <p className="text-[8px] text-gray-500 font-bold tracking-[0.4em] uppercase">Desarrollo</p>
+           <img 
+              src="/logo.png" 
+              alt="Black Hat One" 
+              onError={(e) => e.target.style.display = 'none'} 
+              className="h-3 w-auto grayscale brightness-200" 
+           />
+           <p className="text-[7px] text-gray-800 font-bold tracking-tighter">BLACK HAT ONE</p>
+        </footer>
 
-      <motion.button 
-        whileTap={{ scale: 0.9 }}
-        onClick={onStartScan}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 primary w-20 h-20 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,242,255,0.4)] z-50 flex items-center justify-center border-t border-white/20"
-      >
-        <Plus size={36} strokeWidth={3} />
-      </motion.button>
+        <motion.button 
+          whileTap={{ scale: 0.9 }}
+          onClick={onStartScan}
+          className="primary w-16 h-16 rounded-3xl shadow-[0_15px_40px_rgba(0,242,255,0.3)] flex items-center justify-center border-t border-white/20 active:brightness-125 transition-all"
+        >
+          <Plus size={30} strokeWidth={3} />
+        </motion.button>
+      </div>
     </div>
   )
 }
