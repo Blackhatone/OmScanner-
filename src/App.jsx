@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Settings, Trash2, Share2, Search, FileText, Hash, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Plus, Settings, Trash2, Share2, Search, FileText, Hash, AlertTriangle, ExternalLink, Files } from 'lucide-react'
 import { ScannerService } from './services/ScannerService'
 import { PdfGenerator } from './utils/PdfGenerator'
 import { Capacitor } from '@capacitor/core';
-import logo from './assets/logo.png'
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
@@ -108,7 +107,12 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
       <footer className="mt-16 flex flex-col items-center gap-4 opacity-40 hover:opacity-100 transition-opacity pb-10">
          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent mb-2"></div>
          <p className="text-[10px] text-gray-500 font-bold tracking-[0.3em] uppercase">Desarrollado por</p>
-         <img src={logo} alt="Black Hat One" className="h-6 w-auto grayscale brightness-200 hover:grayscale-0 transition-all" />
+         <img 
+            src="/logo.png" 
+            alt="Black Hat One" 
+            onError={(e) => e.target.style.display = 'none'} 
+            className="h-6 w-auto grayscale brightness-200 hover:grayscale-0 transition-all" 
+         />
          <div className="flex items-center gap-1 text-[9px] text-gray-700 font-medium">
             <span>BLACK HAT ONE</span>
             <ExternalLink size={8} />
