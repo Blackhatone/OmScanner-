@@ -29,13 +29,16 @@ export const ImageProcessor = {
     )
     ctx.restore()
 
+    // Apply Filter
     if (filter === 'magic') {
       this.applyMagicFilter(ctx, canvas.width, canvas.height)
     } else if (filter === 'bw') {
       this.applyBWFilter(ctx, canvas.width, canvas.height)
+    } else if (filter === 'grayscale') {
+      this.applyGrayscaleFilter(ctx, canvas.width, canvas.height)
     }
 
-    return canvas.toDataURL('image/jpeg', 0.9)
+    return canvas.toDataURL('image/jpeg', 0.95)
   },
 
   createImage(url) {
@@ -52,19 +55,25 @@ export const ImageProcessor = {
     const imageData = ctx.getImageData(0, 0, width, height)
     const data = imageData.data
 
-    for (let i = 0; i < data.length; i += 4) {
-      // Basic auto-level/contrast logic
-      let r = data[i]
-      let g = data[i + 1]
-      let b = data[i + 2]
+    // 1. Contrast & Brightness Boost
+    const contrast = 1.6
+    const brightness = 20
+    const factor = (259 * (contrast + 255)) / (255 * (259 - contrast))
 
-      // Increase contrast and brightness
-      const contrast = 1.2
-      const brightness = 30
-      
-      data[i] = Math.min(255, (r - 128) * contrast + 128 + brightness)
-      data[i + 1] = Math.min(255, (g - 128) * contrast + 128 + brightness)
-      data[i + 2] = Math.min(255, (b - 128) * contrast + 128 + brightness)
+    for (let i = 0; i < data.length; i += 4) {
+      // Apply contrast
+      data[i] = factor * (data[i] - 128) + 128 + brightness
+      data[i+1] = factor * (data[i+1] - 128) + 128 + brightness
+      data[i+2] = factor * (data[i+2] - 128) + 128 + brightness
+
+      // 2. Simple "White Background" thresholding
+      // If a pixel is already very bright, make it white
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+      if (avg > 180) {
+        data[i] = Math.min(255, data[i] + 30)
+        data[i+1] = Math.min(255, data[i+1] + 30)
+        data[i+2] = Math.min(255, data[i+2] + 30)
+      }
     }
 
     ctx.putImageData(imageData, 0, 0)
@@ -75,10 +84,22 @@ export const ImageProcessor = {
     const data = imageData.data
 
     for (let i = 0; i < data.length; i += 4) {
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+      const avg = (data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114)
       const threshold = 128
       const val = avg > threshold ? 255 : 0
       data[i] = data[i + 1] = data[i + 2] = val
+    }
+
+    ctx.putImageData(imageData, 0, 0)
+  },
+
+  applyGrayscaleFilter(ctx, width, height) {
+    const imageData = ctx.getImageData(0, 0, width, height)
+    const data = imageData.data
+
+    for (let i = 0; i < data.length; i += 4) {
+      const avg = (data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114)
+      data[i] = data[i + 1] = data[i + 2] = avg
     }
 
     ctx.putImageData(imageData, 0, 0)
