@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 export const ImageProcessor = {
   async processImage(imageSrc, pixelCrop, rotation = 0, filter = 'magic') {
     const image = await this.createImage(imageSrc)
@@ -109,8 +111,8 @@ export const ImageProcessor = {
    * Stitches two ID card sides side-by-side on a virtual A4-style page.
    */
   async stitchIDCard(frontUri, backUri) {
-    const front = await this.createImage(frontUri)
-    const back = await this.createImage(backUri)
+    const front = await this.createImage(Capacitor.convertFileSrc(frontUri))
+    const back = await this.createImage(Capacitor.convertFileSrc(backUri))
 
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')

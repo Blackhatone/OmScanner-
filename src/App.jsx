@@ -211,7 +211,8 @@ function App() {
         setScannedPages([stitchedImage])
         setNamingModalOpen(true)
     } catch (error) {
-        setScanningError("El proceso de Modo Cédula falló: " + error.message)
+        console.error("ID Scan failed", error)
+        setScanningError("El proceso de Modo Cédula falló: " + (error.message || "Error desconocido al procesar la imagen"))
     }
   }
 
