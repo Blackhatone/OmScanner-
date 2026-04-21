@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Settings, Trash2, Share2, Search, FileText, Hash, AlertTriangle, ExternalLink, Files } from 'lucide-react'
 import { ScannerService } from './services/ScannerService'
 import { PdfGenerator } from './utils/PdfGenerator'
-import { Capacitor } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core'
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
@@ -32,7 +32,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
   const filteredDocs = documents.filter(doc => doc.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   return (
-    <div className="p-6 pb-40">
+    <div className="flex flex-col min-h-screen p-6 pb-32">
       <header className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">OmScanner <span className="text-primary text-sm align-top">3.2</span></h1>
@@ -55,13 +55,13 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
         <input 
           type="text" 
           placeholder="Buscar documentos..." 
-          className="bg-transparent border-none outline-none text-sm w-full placeholder:text-gray-700 font-medium"
+          className="bg-transparent border-none outline-none text-sm w-full placeholder:text-gray-700 font-medium text-gray-200"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="space-y-4">
+      <div className="flex-1 space-y-4">
         {filteredDocs.length === 0 ? (
           <div className="glass p-16 flex flex-col items-center justify-center border-dashed border-2 border-white/5 bg-white/[0.01]">
             <div className="bg-white/5 p-6 rounded-full mb-4">
@@ -104,25 +104,25 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
         )}
       </div>
 
-      <footer className="mt-16 flex flex-col items-center gap-4 opacity-40 hover:opacity-100 transition-opacity pb-10">
-         <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent mb-2"></div>
-         <p className="text-[10px] text-gray-500 font-bold tracking-[0.3em] uppercase">Desarrollado por</p>
+      <footer className="mt-12 flex flex-col items-center justify-end gap-3 opacity-30 hover:opacity-100 transition-all duration-700">
+         <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+         <p className="text-[9px] text-gray-500 font-bold tracking-[0.4em] uppercase">Desarrollado por</p>
          <img 
             src="/logo.png" 
             alt="Black Hat One" 
             onError={(e) => e.target.style.display = 'none'} 
-            className="h-6 w-auto grayscale brightness-200 hover:grayscale-0 transition-all" 
+            className="h-5 w-auto grayscale brightness-200 opacity-80" 
          />
-         <div className="flex items-center gap-1 text-[9px] text-gray-700 font-medium">
+         <div className="flex items-center gap-1 text-[8px] text-gray-800 font-bold tracking-tighter">
             <span>BLACK HAT ONE</span>
-            <ExternalLink size={8} />
+            <ExternalLink size={6} />
          </div>
       </footer>
 
       <motion.button 
         whileTap={{ scale: 0.9 }}
         onClick={onStartScan}
-        className="fixed bottom-10 left-1/2 -translate-x-1/2 primary w-20 h-20 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,242,255,0.4)] z-50 flex items-center justify-center border-t border-white/20"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 primary w-20 h-20 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,242,255,0.4)] z-50 flex items-center justify-center border-t border-white/20"
       >
         <Plus size={36} strokeWidth={3} />
       </motion.button>
@@ -198,7 +198,7 @@ function App() {
     if (confirm('¿Deseas eliminar este documento permanentemente?')) {
       try {
         await ScannerService.deleteDocument(name)
-        await loadDocs() // Reload list
+        await loadDocs() 
       } catch (e) {
         alert("No se pudo eliminar el archivo")
       }
