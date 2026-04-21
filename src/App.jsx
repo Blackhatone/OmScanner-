@@ -33,7 +33,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
 
   return (
     <div className="flex flex-col min-h-screen p-6">
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex justify-between items-center mb-8 shrink-0">
         <div>
           <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">OmScanner <span className="text-primary text-sm align-top">3.2</span></h1>
           <p className="text-gray-500 text-[10px] mt-1 font-bold tracking-[0.2em] uppercase">Professional Edition</p>
@@ -42,7 +42,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
       </header>
 
       {scanningError && (
-        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="bg-accent/10 border border-accent/20 p-4 rounded-2xl mb-6 flex gap-3 items-start">
+        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="bg-accent/10 border border-accent/20 p-4 rounded-2xl mb-6 flex gap-3 items-start shrink-0">
             <AlertTriangle className="text-accent shrink-0" size={18} />
             <div className="text-xs text-accent/80 font-medium">
                 <span className="font-bold">Aviso:</span> {scanningError}
@@ -50,7 +50,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
         </motion.div>
       )}
 
-      <div className="glass mb-8 px-4 py-3.5 flex items-center gap-3 bg-white/5 border-white/5 shadow-inner">
+      <div className="glass mb-8 px-4 py-3.5 flex items-center gap-3 bg-white/5 border-white/5 shadow-inner shrink-0">
         <Search size={18} className="text-gray-600" />
         <input 
           type="text" 
@@ -61,13 +61,13 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
         />
       </div>
 
-      <div className="flex-1 space-y-4">
+      <div className="flex-1 space-y-4 mb-10 overflow-y-auto">
         {filteredDocs.length === 0 ? (
           <div className="glass p-16 flex flex-col items-center justify-center border-dashed border-2 border-white/5 bg-white/[0.01]">
             <div className="bg-white/5 p-6 rounded-full mb-4">
               <Files size={32} className="text-gray-800" />
             </div>
-            <p className="text-gray-600 text-xs font-medium">Sin escaneos guardados</p>
+            <p className="text-gray-600 text-xs font-medium text-center">Buzón de escaneos vacío</p>
           </div>
         ) : (
           filteredDocs.map((doc, i) => (
@@ -83,9 +83,9 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-bold truncate text-gray-200">{doc.name.replace('.pdf', '')}</h4>
-                <p className="text-[9px] text-gray-600 mt-1 uppercase font-bold tracking-widest text-primary/40">Documento PDF</p>
+                <p className="text-[9px] text-gray-600 mt-1 uppercase font-bold tracking-widest text-primary/40">PDF Document</p>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 shrink-0">
                 <button 
                    onClick={() => onShare(doc.uri, doc.name)} 
                    className="p-3 text-primary/60 active:scale-90 transition-transform bg-white/5 rounded-xl"
@@ -104,24 +104,28 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError })
         )}
       </div>
 
-      <div className="mt-12 mb-8 flex flex-col items-center gap-6">
-        <footer className="flex flex-col items-center gap-2 opacity-20">
-           <p className="text-[8px] text-gray-500 font-bold tracking-[0.4em] uppercase">Desarrollo</p>
+      <div className="mt-auto flex flex-col items-center gap-6 pt-10 pb-4 shrink-0">
+        <footer className="flex flex-col items-center gap-3 opacity-40">
+           <p className="text-[9px] text-gray-500 font-bold tracking-[0.4em] uppercase">Desarrollado por</p>
            <img 
               src="/logo.png" 
               alt="Black Hat One" 
               onError={(e) => e.target.style.display = 'none'} 
-              className="h-3 w-auto grayscale brightness-200" 
+              className="h-5 w-auto grayscale brightness-200" 
            />
-           <p className="text-[7px] text-gray-800 font-bold tracking-tighter">BLACK HAT ONE</p>
+           <div className="flex items-center gap-1.5 text-[8px] text-gray-400 font-bold tracking-[0.1em]">
+              <span>BLACK HAT ONE</span>
+              <ExternalLink size={7} className="opacity-50" />
+           </div>
         </footer>
 
         <motion.button 
           whileTap={{ scale: 0.9 }}
           onClick={onStartScan}
-          className="primary w-16 h-16 rounded-3xl shadow-[0_15px_40px_rgba(0,242,255,0.3)] flex items-center justify-center border-t border-white/20 active:brightness-125 transition-all"
+          className="primary w-16 h-16 rounded-3xl shadow-[0_15px_40px_rgba(0,242,255,0.3)] flex items-center justify-center border-t border-white/20 active:brightness-125 transition-all overflow-hidden relative"
         >
-          <Plus size={30} strokeWidth={3} />
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+          <Plus size={30} strokeWidth={3} className="relative z-10" />
         </motion.button>
       </div>
     </div>
@@ -204,9 +208,9 @@ function App() {
   }
 
   return (
-    <div className="app-container max-w-lg mx-auto min-h-screen">
+    <div className="app-container max-w-lg mx-auto min-h-screen bg-black">
       <AnimatePresence mode="wait">
-        <motion.div key="dash" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+        <motion.div key="dash" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
           <Dashboard 
              onStartScan={handleStartScan} 
              documents={documents} 
