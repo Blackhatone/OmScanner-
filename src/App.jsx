@@ -72,7 +72,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, onLoad }) => {
               </div>
               <div className="px-1 flex flex-col">
                 <span className="text-xs font-bold truncate text-gray-200">{doc.name}</span>
-                <span className="text-[10px] text-gray-500 mt-0.5">PDF Document</span>
+                <span className="text-[10px] text-gray-500 mt-0-5">PDF Document</span>
               </div>
             </motion.div>
           ))
