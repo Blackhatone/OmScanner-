@@ -10,8 +10,19 @@ export const ScannerService = {
    */
   async scanDocument() {
     try {
+      // 1. Check and request permissions (Mandatory for Android 13+)
+      const permissions = await DocumentScanner.checkPermissions();
+      if (permissions.camera !== 'granted') {
+        const result = await DocumentScanner.requestPermissions();
+        if (result.camera !== 'granted') {
+          alert('Se requiere permiso de cámara para escanear.');
+          return null;
+        }
+      }
+
+      // 2. Launch the native scanner
       const { scans } = await DocumentScanner.scan({
-        maxNumScenes: 20, // Support multi-page (up to 20)
+        maxNumScenes: 20, 
         galleryImportAllowed: true,
       });
       
