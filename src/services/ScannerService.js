@@ -1,36 +1,27 @@
-import { DocumentScanner } from '@capacitor-mlkit/document-scanner';
+import { DocumentScanner } from '@capgo/capacitor-document-scanner';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 
 export const ScannerService = {
   /**
-   * Opens the professional Native ML Kit Scanner.
-   * Handles edge detection, perspective correction and multi-page capture.
+   * Opens the robust Capgo Document Scanner.
+   * This plugin has better compatibility for older Android versions like 11.
    */
   async scanDocument() {
     try {
-      // 1. Check and request permissions (Mandatory for Android 13+)
-      const permissions = await DocumentScanner.checkPermissions();
-      if (permissions.camera !== 'granted') {
-        const result = await DocumentScanner.requestPermissions();
-        if (result.camera !== 'granted') {
-          alert('Se requiere permiso de cámara para escanear.');
-          return null;
-        }
-      }
-
-      // 2. Launch the native scanner
-      const { scans } = await DocumentScanner.scan({
-        maxNumScenes: 20, 
-        galleryImportAllowed: true,
+      const { scannedImages } = await DocumentScanner.scanDocument({
+        // Modes: 0 (Basic), 1 (Filter), 2 (Full)
+        // We use 1 to get a balance of speed and quality
+        letSelectedImage: true
       });
       
-      // scans contains an array of { imageUri: string }
-      return scans.map(s => s.imageUri);
+      // scannedImages is an array of file URIs
+      return scannedImages || [];
     } catch (error) {
-      console.error('Error in Native Scanning:', error);
-      return null;
+      console.error('Error in Capgo Scanning:', error);
+      // Return the error code to help user diagnose
+      throw error;
     }
   },
 
@@ -71,7 +62,6 @@ export const ScannerService = {
         };
       }));
 
-      // Return reverse chronological list
       return docs.filter(d => d.isPdf).sort((a,b) => b.name.localeCompare(a.name));
     } catch (error) {
       console.warn('OmScanner directory might not exist yet');
