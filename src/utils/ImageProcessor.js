@@ -103,5 +103,39 @@ export const ImageProcessor = {
     }
 
     ctx.putImageData(imageData, 0, 0)
+  },
+
+  /**
+   * Stitches two ID card sides side-by-side on a virtual A4-style page.
+   */
+  async stitchIDCard(frontUri, backUri) {
+    const front = await this.createImage(frontUri)
+    const back = await this.createImage(backUri)
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+
+    // We use a high-res landscape A4-style canvas for side-by-side
+    canvas.width = 2480 // 300 DPI A4 is 2480x3508
+    canvas.height = 1754 
+
+    // Background white (for clean print)
+    ctx.fillStyle = '#FFFFFF'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Calculate dimensions for ID cards (roughly 85.6mm x 53.98mm)
+    // We'll scale them to fit the width comfortably
+    const margin = 100
+    const cardWidth = (canvas.width / 2) - (margin * 2)
+    const cardHeight = (front.height * cardWidth) / front.width
+
+    // Draw Front
+    ctx.drawImage(front, margin, margin, cardWidth, cardHeight)
+    
+    // Draw Back
+    ctx.drawImage(back, (canvas.width / 2) + margin, margin, cardWidth, cardHeight)
+
+    return canvas.toDataURL('image/jpeg', 0.9)
   }
 }

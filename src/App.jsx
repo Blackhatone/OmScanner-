@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Sun, Moon, Trash2, Share2, Search, FileText, Hash, AlertTriangle, ExternalLink, Files } from 'lucide-react'
+import { Plus, Sun, Moon, Trash2, Share2, Search, FileText, Hash, AlertTriangle, ExternalLink, Files, CreditCard } from 'lucide-react'
 import { ScannerService } from './services/ScannerService'
 import { PdfGenerator } from './utils/PdfGenerator'
+import { ImageProcessor } from './utils/ImageProcessor'
 import { Capacitor } from '@capacitor/core'
 
 const pageVariants = {
@@ -27,7 +28,7 @@ const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
   )
 }
 
-const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError, isDarkMode, onToggleTheme }) => {
+const Dashboard = ({ onStartScan, onStartIDScan, documents, onShare, onDelete, scanningError, isDarkMode, onToggleTheme }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const filteredDocs = documents.filter(doc => doc.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -38,12 +39,14 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError, i
           <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">OmScanner <span className="text-primary text-sm align-top">3.2</span></h1>
           <p className="text-muted text-[10px] mt-1 font-bold tracking-[0.2em] uppercase">Professional Edition</p>
         </div>
-        <button 
-          onClick={onToggleTheme}
-          className="glass p-3 rounded-2xl active:scale-95 transition-transform"
-        >
-          {isDarkMode ? <Sun size={20} className="text-primary" /> : <Moon size={20} className="text-primary" />}
-        </button>
+        <div className="flex gap-2">
+            <button 
+            onClick={onToggleTheme}
+            className="glass p-3 rounded-2xl active:scale-95 transition-transform"
+            >
+            {isDarkMode ? <Sun size={20} className="text-primary" /> : <Moon size={20} className="text-primary" />}
+            </button>
+        </div>
       </header>
 
       {scanningError && (
@@ -110,7 +113,7 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError, i
       </div>
 
       <div className="mt-auto flex flex-col items-center gap-6 pt-10 pb-4 shrink-0">
-        <footer className="flex flex-col items-center gap-3 opacity-40">
+        <footer className="flex flex-col items-center gap-2 opacity-40">
            <p className="text-[9px] text-muted font-bold tracking-[0.4em] uppercase">Desarrollado por</p>
            <img 
               src="/logo.png" 
@@ -118,20 +121,27 @@ const Dashboard = ({ onStartScan, documents, onShare, onDelete, scanningError, i
               onError={(e) => e.target.style.display = 'none'} 
               className={`h-4 w-auto ${isDarkMode ? 'grayscale brightness-200' : 'grayscale brightness-50'}`} 
            />
-           <div className="flex items-center gap-1.5 text-[8px] text-muted font-bold tracking-[0.1em]">
-              <span>BLACK HAT ONE</span>
-              <ExternalLink size={7} className="opacity-50" />
-           </div>
+           <p className="text-[7px] text-muted font-bold tracking-tighter uppercase font-bold tracking-widest text-primary/40">Black Hat One</p>
         </footer>
 
-        <motion.button 
-          whileTap={{ scale: 0.9 }}
-          onClick={onStartScan}
-          className="primary w-16 h-16 rounded-3xl shadow-[0_15px_40px_rgba(0,242,255,0.3)] flex items-center justify-center border-t border-white/20 active:brightness-125 transition-all overflow-hidden relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
-          <Plus size={30} strokeWidth={3} className="relative z-10 text-black" />
-        </motion.button>
+        <div className="flex items-center gap-6">
+            <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={onStartIDScan}
+                className="glass w-16 h-16 rounded-3xl flex items-center justify-center border-white/10 active:bg-primary/20 transition-all"
+            >
+                <CreditCard size={28} className="text-primary/70" />
+            </motion.button>
+
+            <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={onStartScan}
+                className="primary w-16 h-16 rounded-3xl shadow-[0_15px_40px_rgba(0,242,255,0.3)] flex items-center justify-center border-t border-white/20 active:brightness-125 transition-all overflow-hidden relative"
+            >
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+                <Plus size={30} strokeWidth={3} className="relative z-10 text-black" />
+            </motion.button>
+        </div>
       </div>
     </div>
   )
@@ -185,11 +195,34 @@ function App() {
     }
   }
 
+  const handleIDCardScan = async () => {
+    setScanningError(null)
+    try {
+        alert("Paso 1: Por favor, escanea el FRENTE de la cédula.")
+        const front = await ScannerService.scanDocument()
+        if (!front || front.length === 0) return
+
+        alert("Paso 2: ¡Muy bien! Ahora escanea el DORSO de la cédula.")
+        const back = await ScannerService.scanDocument()
+        if (!back || back.length === 0) return
+
+        // Proceso de unión
+        const stitchedImage = await ImageProcessor.stitchIDCard(front[0], back[0])
+        setScannedPages([stitchedImage])
+        setNamingModalOpen(true)
+    } catch (error) {
+        setScanningError("El proceso de Modo Cédula falló: " + error.message)
+    }
+  }
+
   const handleSavePdf = async () => {
     const finalName = pdfName.trim() || `Scan_${new Date().toISOString().replace(/[:.-]/g, '_')}`
     
     try {
         const imagesAsBase64 = await Promise.all(scannedPages.map(async (uri) => {
+            // If it's already a DataURL (from stitchIDCard), return as is
+            if (uri.startsWith('data:')) return uri
+
             const dataUrl = Capacitor.convertFileSrc(uri)
             const response = await fetch(dataUrl)
             const blob = await response.blob()
@@ -231,7 +264,8 @@ function App() {
       <AnimatePresence mode="wait">
         <motion.div key="dash" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
           <Dashboard 
-             onStartScan={handleStartScan} 
+             onStartScan={handleStartScan}
+             onStartIDScan={handleIDCardScan}
              documents={documents} 
              onShare={handleShare}
              onDelete={handleDelete}
@@ -249,7 +283,7 @@ function App() {
         title="Guardar Escaneo"
       >
         <div className="space-y-5">
-          <p className="text-muted text-[10px] font-bold uppercase tracking-[0.2em]">{scannedPages.length} páginas detectadas</p>
+          <p className="text-muted text-[10px] font-bold uppercase tracking-[0.2em]">{scannedPages.length > 1 ? `${scannedPages.length} páginas` : 'Frente y Dorso'} detectados</p>
           <div className="glass px-4 py-4 flex items-center gap-3 bg-input border-white/5 focus-within:border-primary/30 transition-colors">
              <Hash size={18} className="text-primary/60" />
              <input 
